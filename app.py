@@ -10,7 +10,7 @@ import plotly.express as px
 # -----------------------------
 st.set_page_config(page_title="Placement Predictor", layout="wide")
 
-st.title("🎓 Student Placement Predictor")
+st.title("🎓 Student Placement Predictor Dashboard")
 
 # -----------------------------
 # Load Data
@@ -72,21 +72,21 @@ if st.sidebar.button("Predict Placement"):
         st.error("❌ Student will NOT be placed")
 
 # -----------------------------
-# 📊 Interactive Graph
+# 📊 MAIN VISUALS
 # -----------------------------
 st.subheader("📊 CGPA vs Aptitude Analysis")
 
-fig = px.scatter(
+fig1 = px.scatter(
     train,
     x="CGPA",
     y="Aptitude_Test_Score",
     color="Placement_Status",
     size="Coding_Skills",
-    title="Placement Analysis",
-    animation_frame="Age"   # 🎬 Animation
+    animation_frame="Age",
+    title="Placement Analysis"
 )
 
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig1, use_container_width=True)
 
 # -----------------------------
 # 📊 Feature Importance
@@ -108,3 +108,117 @@ fig2 = px.bar(
 )
 
 st.plotly_chart(fig2, use_container_width=True)
+
+# -----------------------------
+# 📊 Heatmap
+# -----------------------------
+st.subheader("📊 Correlation Heatmap")
+
+corr = train.corr()
+
+fig_heat = px.imshow(
+    corr,
+    text_auto=True,
+    title="Feature Correlation"
+)
+
+st.plotly_chart(fig_heat, use_container_width=True)
+
+# -----------------------------
+# 📊 Placement Distribution
+# -----------------------------
+st.subheader("📊 Placement Distribution")
+
+fig3 = px.pie(
+    train,
+    names="Placement_Status",
+    title="Placed vs Not Placed"
+)
+
+st.plotly_chart(fig3, use_container_width=True)
+
+# -----------------------------
+# 📊 CGPA Distribution
+# -----------------------------
+st.subheader("📊 CGPA Distribution")
+
+fig4 = px.histogram(
+    train,
+    x="CGPA",
+    color="Placement_Status",
+    nbins=20,
+    title="CGPA Distribution"
+)
+
+st.plotly_chart(fig4, use_container_width=True)
+
+# -----------------------------
+# 📊 Skills Bubble Chart
+# -----------------------------
+st.subheader("📊 Skills Impact")
+
+fig5 = px.scatter(
+    train,
+    x="Coding_Skills",
+    y="Communication_Skills",
+    size="CGPA",
+    color="Placement_Status",
+    title="Skills vs Placement"
+)
+
+st.plotly_chart(fig5, use_container_width=True)
+
+# -----------------------------
+# 📊 Internships Analysis
+# -----------------------------
+st.subheader("📊 Internships Impact")
+
+fig6 = px.box(
+    train,
+    x="Placement_Status",
+    y="Internships",
+    title="Internships vs Placement"
+)
+
+st.plotly_chart(fig6, use_container_width=True)
+
+# -----------------------------
+# 🎬 Animated Trend
+# -----------------------------
+st.subheader("🎬 Animated Placement Trend")
+
+fig7 = px.scatter(
+    train,
+    x="CGPA",
+    y="Aptitude_Test_Score",
+    color="Placement_Status",
+    size="Coding_Skills",
+    animation_frame="Age",
+    title="Dynamic Placement Visualization"
+)
+
+st.plotly_chart(fig7, use_container_width=True)
+
+# -----------------------------
+# 🧠 Insights Section
+# -----------------------------
+st.subheader("🧠 Key Insights & Conclusions")
+
+st.markdown("""
+### 🔍 Key Findings:
+
+- Higher **CGPA → Higher placement chances**
+- **Coding + Communication skills** are critical
+- **Internships & Projects boost placement**
+- **Backlogs reduce chances significantly**
+- Skills combination matters more than a single factor
+
+### 🎯 Final Conclusion:
+
+Placement depends on:
+- Academic performance (CGPA)
+- Practical exposure (Internships, Projects)
+- Technical + soft skills
+
+👉 Students who improve all these areas have the highest success rate.
+""")
