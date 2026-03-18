@@ -5,13 +5,9 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
 import plotly.express as px
 
-import plotly.express as px
-
-fig = px.scatter(train, x="CGPA", y="Aptitude_Test_Score",
-                 color="Placement_Status")
-
-st.plotly_chart(fig)
-
+# -----------------------------
+# Page Config
+# -----------------------------
 st.set_page_config(page_title="Placement Predictor", layout="wide")
 
 st.title("🎓 Student Placement Predictor")
@@ -21,6 +17,7 @@ st.title("🎓 Student Placement Predictor")
 # -----------------------------
 train = pd.read_csv("train.csv")
 
+# Show dataset
 if st.checkbox("Show Dataset"):
     st.dataframe(train.head())
 
@@ -32,6 +29,9 @@ le = LabelEncoder()
 for col in ['Gender','Degree','Branch','Placement_Status']:
     train[col] = le.fit_transform(train[col])
 
+# -----------------------------
+# Features & Target
+# -----------------------------
 X = train.drop(['Student_ID','Placement_Status'], axis=1)
 y = train['Placement_Status']
 
@@ -42,7 +42,7 @@ model = RandomForestClassifier()
 model.fit(X, y)
 
 # -----------------------------
-# USER INPUT SECTION
+# Sidebar Input
 # -----------------------------
 st.sidebar.header("Enter Student Details")
 
@@ -72,17 +72,19 @@ if st.sidebar.button("Predict Placement"):
         st.error("❌ Student will NOT be placed")
 
 # -----------------------------
-# 📊 INTERACTIVE GRAPH (Plotly)
+# 📊 Interactive Graph
 # -----------------------------
-st.subheader("📊 CGPA vs Placement")
+st.subheader("📊 CGPA vs Aptitude Analysis")
 
-fig = px.scatter(train,
-                 x="CGPA",
-                 y="Aptitude_Test_Score",
-                 color="Placement_Status",
-                 size="Coding_Skills",
-                 title="Placement Analysis",
-                 animation_frame="Age")   # 🔥 animation
+fig = px.scatter(
+    train,
+    x="CGPA",
+    y="Aptitude_Test_Score",
+    color="Placement_Status",
+    size="Coding_Skills",
+    title="Placement Analysis",
+    animation_frame="Age"   # 🎬 Animation
+)
 
 st.plotly_chart(fig, use_container_width=True)
 
@@ -98,6 +100,11 @@ imp_df = pd.DataFrame({
     "Importance": importance
 }).sort_values(by="Importance", ascending=False)
 
-fig2 = px.bar(imp_df, x="Feature", y="Importance", title="Feature Importance")
+fig2 = px.bar(
+    imp_df,
+    x="Feature",
+    y="Importance",
+    title="Factors Affecting Placement"
+)
 
 st.plotly_chart(fig2, use_container_width=True)
