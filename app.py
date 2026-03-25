@@ -3,29 +3,54 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
 import plotly.express as px
+import streamlit.components.v1 as components
 
 # -----------------------------
-# PAGE CONFIG + UI STYLE
+# PAGE CONFIG
 # -----------------------------
 st.set_page_config(page_title="Placement Predictor", layout="wide")
 
-# Animated background
+# -----------------------------
+# 🔥 VANTA BACKGROUND
+# -----------------------------
+components.html("""
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
+</head>
+<body>
+
+<div id="vanta-bg" style="width:100vw; height:100vh;"></div>
+
+<script>
+VANTA.NET({
+  el: "#vanta-bg",
+  mouseControls: true,
+  touchControls: true,
+  gyroControls: false,
+  color: 0x00ffff,
+  backgroundColor: 0x0f2027
+});
+</script>
+
+</body>
+</html>
+""", height=300)
+
+# Make content readable
 st.markdown("""
 <style>
-@keyframes gradientBG {
-    0% {background-position: 0% 50%;}
-    50% {background-position: 100% 50%;}
-    100% {background-position: 0% 50%;}
-}
-.stApp {
-    background: linear-gradient(-45deg, #1e3c72, #2a5298, #6a11cb, #2575fc);
-    background-size: 400% 400%;
-    animation: gradientBG 10s ease infinite;
-    color: white;
+.main {
+    background: transparent !important;
 }
 </style>
 """, unsafe_allow_html=True)
 
+# -----------------------------
+# TITLE
+# -----------------------------
 st.title("🎓 AI-Based Student Placement Advisor")
 
 # -----------------------------
@@ -47,7 +72,7 @@ for col in categorical_cols:
         train[col] = le.fit_transform(train[col])
 
 # -----------------------------
-# MODEL TRAINING
+# MODEL
 # -----------------------------
 X = train.drop(['Student_ID','Placement_Status'], axis=1)
 y = train['Placement_Status']
@@ -56,7 +81,7 @@ model = RandomForestClassifier()
 model.fit(X, y)
 
 # -----------------------------
-# USER INPUT (DYNAMIC)
+# INPUT SECTION
 # -----------------------------
 st.sidebar.header("📥 Enter Student Details")
 
@@ -79,7 +104,7 @@ for col in X.columns:
         input_dict[col] = st.sidebar.number_input(col, 0, 100, 0)
 
 # -----------------------------
-# PREDICTION + SUGGESTIONS
+# PREDICTION + AI SUGGESTIONS
 # -----------------------------
 if st.sidebar.button("Predict Placement"):
 
@@ -93,9 +118,7 @@ if st.sidebar.button("Predict Placement"):
     else:
         st.error("❌ Student will NOT be placed")
 
-    # -----------------------------
-    # AI SUGGESTIONS
-    # -----------------------------
+    # Suggestions
     st.subheader("🧠 Personalized Improvement Suggestions")
 
     suggestions = []
@@ -104,13 +127,13 @@ if st.sidebar.button("Predict Placement"):
         suggestions.append("📈 Improve CGPA (target above 7)")
 
     if input_dict.get("Coding_Skills", 0) < 6:
-        suggestions.append("💻 Improve coding skills (DSA + projects)")
+        suggestions.append("💻 Improve coding skills")
 
     if input_dict.get("Communication_Skills", 0) < 6:
-        suggestions.append("🗣 Work on communication (mock interviews)")
+        suggestions.append("🗣 Improve communication")
 
     if input_dict.get("Internships", 0) < 2:
-        suggestions.append("🏢 Do more internships")
+        suggestions.append("🏢 Gain internship experience")
 
     if input_dict.get("Projects", 0) < 2:
         suggestions.append("📂 Build more projects")
@@ -127,22 +150,20 @@ if st.sidebar.button("Predict Placement"):
     else:
         st.success("🔥 Excellent profile!")
 
-    # -----------------------------
-    # FINAL EVALUATION
-    # -----------------------------
+    # Final advice
     st.subheader("🎯 Final Evaluation")
 
     if prediction[0] == 1:
         st.info("You are on the right track. Keep improving!")
     else:
-        st.info("Focus on the above areas to improve placement chances.")
+        st.info("Focus on improvements to increase chances.")
 
 # -----------------------------
-# VISUALIZATIONS
+# VISUALIZATION SECTION
 # -----------------------------
 
 st.subheader("📊 CGPA Distribution")
-fig1 = px.histogram(train, x="CGPA", color="Placement_Status", nbins=20)
+fig1 = px.histogram(train, x="CGPA", color="Placement_Status")
 st.plotly_chart(fig1, use_container_width=True)
 
 st.subheader("📊 Skills Analysis")
@@ -151,32 +172,31 @@ fig2 = px.scatter(train,
                   y="Communication_Skills",
                   size="CGPA",
                   color="Placement_Status")
-st.plotly_chart(fig2, use_container_width=True)
+st.plotly_chart(fig2)
 
 st.subheader("📊 Internship Impact")
 fig3 = px.box(train,
               x="Placement_Status",
               y="Internships",
               color="Placement_Status")
-st.plotly_chart(fig3, use_container_width=True)
+st.plotly_chart(fig3)
 
-st.subheader("📊 Heatmap")
-corr = train.corr()
-fig4 = px.imshow(corr, text_auto=True)
-st.plotly_chart(fig4, use_container_width=True)
+st.subheader("📊 Correlation Heatmap")
+fig4 = px.imshow(train.corr(), text_auto=True)
+st.plotly_chart(fig4)
 
 st.subheader("📊 Placement Distribution")
 counts = train['Placement_Status'].value_counts()
 fig5 = px.pie(names=["Not Placed", "Placed"],
               values=counts.values,
               hole=0.4)
-st.plotly_chart(fig5, use_container_width=True)
+st.plotly_chart(fig5)
 
 st.subheader("📊 Feature Importance")
 importance = model.feature_importances_
 imp_df = pd.DataFrame({"Feature": X.columns, "Importance": importance})
 fig6 = px.bar(imp_df, x="Feature", y="Importance")
-st.plotly_chart(fig6, use_container_width=True)
+st.plotly_chart(fig6)
 
 st.subheader("🎬 Animated Trend")
 fig7 = px.scatter(train,
@@ -185,17 +205,17 @@ fig7 = px.scatter(train,
                   color="Placement_Status",
                   size="Coding_Skills",
                   animation_frame="Age")
-st.plotly_chart(fig7, use_container_width=True)
+st.plotly_chart(fig7)
 
 # -----------------------------
-# FINAL INSIGHT
+# FINAL CONCLUSION
 # -----------------------------
 st.subheader("🧠 Conclusion")
 
 st.markdown("""
 - CGPA, skills, and internships are key factors  
-- Backlogs negatively affect placement  
+- Backlogs reduce placement chances  
 - Balanced profile leads to success  
 
-👉 This system not only predicts but guides improvement.
+👉 This system predicts AND guides improvement
 """)
