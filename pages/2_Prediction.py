@@ -36,7 +36,7 @@ with prediction_col:
     with col3:
         skills = st.slider("Skills (0-10)", 0, 10, 5)
         mini_projects = st.number_input("Mini Projects", 0, 5, 1)
-        communication = st.slider("Communication Rating (0-5)", 0, 5, 3, 0.5)
+        communication = st.slider("Communication Rating (0-5)", 0.0, 5.0, 3.0, 0.5)
     
     st.divider()
     

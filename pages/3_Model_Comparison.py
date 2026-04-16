@@ -94,7 +94,7 @@ with col_test_a:
     test_projects = st.number_input("Test Major Projects", 0, 5, 2)
 
 with col_test_b:
-    test_comm = st.slider("Test Communication", 0, 5, 3, 0.5)
+    test_comm = st.slider("Test Communication", 0.0, 5.0, 3.0, 0.5)
     test_mini = st.number_input("Test Mini Projects", 0, 5, 1)
     test_backlogs = st.number_input("Test Backlogs", 0, 10, 0)
 
