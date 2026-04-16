@@ -31,19 +31,19 @@ DEFAULT_MODEL = "Random Forest"
 TEST_SIZE = 0.2
 RANDOM_STATE = 42
 
-# Feature Names (must match CSV columns)
+# Feature Names (must match CSV columns) - Updated for new dataset
 FEATURE_COLUMNS = [
-    'Age', 'Gender', 'Degree', 'Branch', 'CGPA', 'Internships',
-    'Projects', 'Coding_Skills', 'Communication_Skills',
-    'Aptitude_Test_Score', 'Certifications', 'Backlogs'
+    'CGPA', 'Major Projects', 'Workshops/Certificatios', 'Mini Projects',
+    'Skills', 'Communication Skill Rating', 'Internship', 'Hackathon',
+    '12th Percentage', '10th Percentage', 'backlogs'
 ]
 
-CATEGORICAL_COLS = ['Gender', 'Degree', 'Branch']
-NUMERICAL_COLS = ['CGPA', 'Internships', 'Projects', 'Coding_Skills',
-                   'Communication_Skills', 'Aptitude_Test_Score',
-                   'Certifications', 'Backlogs', 'Age']
+CATEGORICAL_COLS = ['Internship', 'Hackathon']
+NUMERICAL_COLS = ['CGPA', 'Major Projects', 'Workshops/Certificatios', 'Mini Projects',
+                   'Skills', 'Communication Skill Rating',
+                   '12th Percentage', '10th Percentage', 'backlogs']
 
-TARGET_COL = 'Placement_Status'
+TARGET_COL = 'PlacementStatus'
 
 # Thresholds
 CGPA_PLACEMENT_THRESHOLD = 7.0

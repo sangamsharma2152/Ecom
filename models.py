@@ -11,7 +11,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
-from config import TRAIN_DATA, CATEGORICAL_COLS, TEST_SIZE, RANDOM_STATE
+from config import TRAIN_DATA, CATEGORICAL_COLS, TEST_SIZE, RANDOM_STATE, TARGET_COL
 
 # Optional imports
 try:
@@ -35,16 +35,27 @@ class PlacementModel:
         self.df = pd.read_csv(TRAIN_DATA)
         self.df_original = self.df.copy()
         
+        # Drop StudentId and index column if present
+        cols_to_drop = [col for col in self.df.columns if col in ['StudentId', 'Unnamed: 0']]
+        self.df = self.df.drop(columns=cols_to_drop, errors='ignore')
+        
         # Encode categorical variables
         for col in CATEGORICAL_COLS:
             if col in self.df.columns:
                 le = LabelEncoder()
-                self.df[col] = le.fit_transform(self.df[col])
+                self.df[col] = le.fit_transform(self.df[col].astype(str))
                 self.label_encoders[col] = le
         
         # Features and target
-        self.X = self.df.drop(['Student_ID', 'Placement_Status'], axis=1)
-        self.y = self.df['Placement_Status']
+        self.X = self.df.drop([TARGET_COL], axis=1, errors='ignore')
+        self.y = self.df[TARGET_COL]
+        
+        # Encode target variable if it's categorical
+        if self.y.dtype == 'object':
+            le_target = LabelEncoder()
+            self.y = le_target.fit_transform(self.y)
+            self.label_encoders['_target_'] = le_target
+        
         self.feature_names = self.X.columns.tolist()
         
         # Split data
