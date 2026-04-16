@@ -107,16 +107,32 @@ class PlacementModel:
         model = self.models[model_name]
         y_pred = model.predict(self.X_test)
         
+        # Ensure y_test is numeric
+        y_test_numeric = self.y_test
+        if isinstance(y_test_numeric, pd.Series):
+            y_test_numeric = y_test_numeric.values
+        
+        try:
+            # Convert to numeric if needed
+            if y_pred.dtype == 'object':
+                le = LabelEncoder()
+                y_pred = le.fit_transform(y_pred)
+            if y_test_numeric.dtype == 'object':
+                le = LabelEncoder()
+                y_test_numeric = le.fit_transform(y_test_numeric)
+        except:
+            pass
+        
         metrics = {
-            'Accuracy': accuracy_score(self.y_test, y_pred),
-            'Precision': precision_score(self.y_test, y_pred),
-            'Recall': recall_score(self.y_test, y_pred),
-            'F1-Score': f1_score(self.y_test, y_pred)
+            'Accuracy': accuracy_score(y_test_numeric, y_pred),
+            'Precision': precision_score(y_test_numeric, y_pred, zero_division=0, average='binary'),
+            'Recall': recall_score(y_test_numeric, y_pred, zero_division=0, average='binary'),
+            'F1-Score': f1_score(y_test_numeric, y_pred, zero_division=0, average='binary')
         }
         
         try:
             y_pred_proba = model.predict_proba(self.X_test)[:, 1]
-            metrics['ROC-AUC'] = roc_auc_score(self.y_test, y_pred_proba)
+            metrics['ROC-AUC'] = roc_auc_score(y_test_numeric, y_pred_proba)
         except:
             metrics['ROC-AUC'] = None
         
