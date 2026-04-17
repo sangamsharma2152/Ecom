@@ -1,0 +1,27 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Build ECommerce App",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoProfile",
+				"-Command",
+				"if (!(Test-Path out)) { New-Item -ItemType Directory -Path out | Out-Null }; $files = Get-ChildItem -Path src -Filter *.java -Recurse | ForEach-Object { $_.FullName }; javac -d out $files"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Run ECommerce App",
+			"type": "shell",
+			"command": "java",
+			"args": [
+				"-cp",
+				"out",
+				"com.capstone.ecommerce.app.AppMain"
+			],
+			"group": "none"
+		}
+	]
+}
